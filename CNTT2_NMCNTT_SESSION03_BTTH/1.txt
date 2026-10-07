@@ -1,0 +1,50 @@
+PHẦN 1: PHÂN TÍCH CÁC SAI LẦM VÀ GIẢI THÍCH KỸ THUẬT
+1. Các sai lầm của Nam:
+• Sai lầm 1 — Vị trí lưu trữ dữ liệu nguy hiểm (C:\Windows\System32\...):
+- System32 là thư mục chứa các tệp tin hệ thống cốt lõi của Windows. Việc lưu dữ liệu cá nhân tại đây nguy cơ cao làm hỏng hệ điều hành nếu vô tình xóa/sửa nhầm file hệ thống.
+- Thư mục System32 yêu cầu quyền Quản trị viên (Administrator) để chỉnh sửa, gây phiền phức khi chạy code. Đồng thời, nếu Windows bị lỗi phải cài lại, toàn bộ dữ liệu ở ổ C: sẽ bị mất.
+• Sai lầm 2 — Vi phạm quy tắc đặt tên (Naming Convention):
+- Chứa khoảng trắng: Bai Tap Cua Nam, Session 01, bai tap 1.py dùng khoảng trắng, dễ gây lỗi phân tách tham số khi chạy lệnh trên Terminal/CLI hoặc khi import module trong Python.
+- Chứa chữ hoa/thường lộn xộn: Không nhất quán chuẩn đặt tên cho tài nguyên/code.
+• Sai lầm 3 — Hiểu lầm giữa Megabit ($b$) và Megabyte ($B$):
+- Gói mạng: Bằng 100 Mbps (Megabits per second - Megabit trên giây).
+- Tốc độ tải hiển thị: Bằng 12.5 MB/s (Megabytes per second - Megabyte trên giây).
+- Giải thích: 1 Byte (B) = 8 bits (b). Do đó, tốc độ lý thuyết tối đa của gói 100 Mbps là:
+             100 Mbps ÷ 8 = 12.5 MB/s
+- Con số 12.5 MB/s thể hiện nhà mạng đã cung cấp đúng và đủ 100% băng thông cam kết, Nam đã nhầm lẫn giữa đơn vị Bit (b) và Byte (B).
+2. Giải thích tại sao ổ SSD 256 GB thực tế hiển thị dung lượng thấp hơn con số 256:
+Có 2 nguyên nhân kỹ thuật chính:
+   1 Sự chênh lệch giữa Hệ thập phân (Nhà sản xuất) và Hệ nhị phân (Hệ điều hành Windows):
+• Nhà sản xuất ổ cứng: Tính theo hệ thập phân (Cơ số 10):
+          1 GB = 10^9 Bytes = 1,000,000,000 Bytes
+          → 256 GB = 256 × 1,000,000,000 Bytes = 256,000,000,000 Bytes
+• Hệ điều hành Windows: Tính theo hệ nhị phân (Cơ số 2, dùng hệ số 1024 / GiBiByte - GiB):
+              1 KiB = 1024 Bytes, 1 MiB = 1024 KiB, 1 GiB = 1024 MiB
+• Dung lượng thực tế Windows nhận diện được:
+              Dung lượng (GiB) = 256,000,000,000 ÷ (1024 × 1024 × 1024) ≈ 238.418 GiB (Windows hiển thị tắt là GB)
+   2 Dung lượng bị chiếm dụng bởi hệ thống:
+• Phân vùng khôi phục ẩn của hệ thống (System Recovery Partition), phân vùng Boot EFI.
+• Dung lượng bị Windows chiếm dụng làm bộ nhớ đệm (Pagefile / Virtual Memory) và file ngủ đông (Hibernation file).
+PHẦN 2: THIẾT KẾ LẠI CÂY THƯ MỤC HỌC TẬP CHUẨN TRÊN Ổ D:
+Áp dụng Mô hình 4 Trụ Cột, Quy tắc 3 Cấp Thư Mục và Chuẩn đặt tên kebab-case (không dấu, viết thường, phân tách bằng dấu -):
+1. Sơ đồ Cây thư mục chuẩn trên D:\
+D:\
+├── 01-hoc-tap/                         <-- CẤP 1: Trụ cột 1 (Học tập & Môn học)
+│   ├── it108-nhap-mon-cntt/            <-- CẤP 2: Thư mục Môn học (kebab-case)
+│   │   ├── session-01/                 <-- CẤP 3: Nhóm nội dung / Buổi học
+│   │   │   └── bai-tap-1.py            <-- File bài tập chuẩn
+│   │   └── session-02/
+│   │       └── bai-tap-2.py
+│   └── lap-trinh-huong-doi-tuong/
+│       └── session-01/
+├── 02-projects/                        <-- CẤP 1: Trụ cột 2 (Dự án & Source code)
+│   └── python-basic-apps/              <-- CẤP 2: Dự án
+│       └── src/                        <-- CẤP 3: Mã nguồn
+├── 03-personal/                        <-- CẤP 1: Trụ cột 3 (Tài liệu cá nhân)
+│   └── giay-to-sinh-vien/
+│       └── ly-lich/
+└── 04-media/                           <-- CẤP 1: Trụ cột 4 (Hình ảnh, Video học tập)
+    └── ui-assets/
+        └── icons/
+2. Đường dẫn truy cập chuẩn tới file bài tập Python của Nam:
+D:\01-hoc-tap\it108-nhap-mon-cntt\session-01\bai-tap-1.py

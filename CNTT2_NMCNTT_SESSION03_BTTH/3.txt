@@ -1,0 +1,46 @@
+BÁO CÁO THIẾT KẾ HỆ THỐNG IoT TRANG TRẠI LAN THÔNG MINH
+PHẦN 1: THIẾT KẾ KIẾN TRÚC LUỒNG TRI THỨC DIKW
+Mô hình DIKW biểu diễn quá trình chuyển hóa từ dữ liệu thô thu thập từ cảm biến đến các quyết định thông minh tự động cho trang trại:
+[ Tầng 4: WISDOM (Trí tuệ) ]       --> Tối ưu hóa tưới tiêu dựa trên dự báo thời tiết dài hạn
+          ▲
+[ Tầng 3: KNOWLEDGE (Tri thức) ]    --> Tự động kích hoạt máy bơm khi Nhiệt độ > 35°C
+          ▲
+[ Tầng 2: INFORMATION (Thông tin) ] --> Cảnh báo & Hiển thị chỉ số môi trường cho chủ vườn
+          ▲
+[ Tầng 1: DATA (Dữ liệu thô) ]      --> Số đo độ ẩm, nhiệt độ thu thập từ Cảm biến
+Chi tiết từng tầng trong kiến trúc:
+   1 Tầng 1 — Data (Dữ liệu thô):
+• Mô tả: Các giá trị số đo đơn lẻ, chưa qua xử lý do hệ thống cảm biến môi trường (Sensors) gửi về theo thời gian thực.
+• Ví dụ: Air_Humidity = 45%, Temperature = 36°C, Soil_Moisture = 30%.
+   2 Tầng 2 — Information (Thông tin):
+• Mô tả: Dữ liệu thô được gán ngữ cảnh, mốc thời gian và định dạng để con người đọc hiểu được.
+• Ví dụ: "Độ ẩm không khí lúc 14:00 tại Khu A giảm xuống 45%, Nhiệt độ đạt 36°C" → Hệ thống tự động gửi thông báo đẩy (Push Notification) hiển thị trên ứng dụng của chủ vườn.
+   3 Tầng 3 — Knowledge (Tri thức):
+• Mô tả: Áp dụng các quy tắc logic (If-Then rules) kết hợp với tri thức chuyên môn về kỹ thuật trồng lan để đưa ra phản ứng tự động.
+- Ví dụ: IF Temperature > 35°C AND Soil_Moisture < 50% → THEN Hệ thống kích hoạt van điện từ và khởi động máy bơm tưới phun sương.
+   4 Tầng 4 — Wisdom (Trí tuệ / Quyết định tối ưu):
+- Mô tả: Kết hợp dữ liệu lịch sử, thuật toán dự báo và tích hợp API thời tiết dài hạn để đưa ra quyết định tưới thông minh, tối ưu chi phí vận hành.
+- Ví dụ: Dù nhiệt độ hiện tại đạt 36°C (thỏa mãn quy tắc tầng Knowledge), nhưng hệ thống truy vấn API thời tiết thấy sắp có mưa lớn trong 30 phút tới → Hệ thống tự động hoãn/giảm 80\% lượng nước tưới để tránh úng rễ lan và tiết kiệm điện, nước.
+PHẦN 2: XỬ LÝ RÀNG BUỘC & BẪY DỮ LIỆU
+1. Xử lý Bẫy 1: Quản lý File cấu hình ẩn (.env, .git)
+• Bản chất kỹ thuật: Dấu chấm (.) ở đầu tên file khiến Hệ điều hành hiểu đây là file cấu hình hệ thống và tự động ẩn đi để tránh thao tác xóa/sửa nhầm.
+• Quy trình quản lý & Bảo vệ:
+   1 Bật hiển thị File ẩn: Trong Windows File Explorer, truy cập tab View → Tích chọn Hidden items và File name extensions để quan sát file .env.
+   2 Bảo vệ mã nguồn: Khai báo file .env vào trong .gitignore để tránh vô tình push mật khẩu/API Key lên GitHub public.
+   3 Sao lưu an toàn: Tạo file mẫu .env.example (chỉ chứa tên biến, để trống mật khẩu) phục vụ việc bàn giao code.
+2. Xử lý Bẫy 2: Tính toán Dung lượng Ổ cứng cho 1 Năm
+Thông số bài toán:
+• Dữ liệu phát sinh: 50 MB/ngày.
+• Thời gian lưu trữ: 1 năm = 365 ngày.
+• Ngưỡng dung lượng tối đa cho phép: 70\% dung lượng đĩa (giữ lại 30% trống cho HDH vận hành).
+Các bước tính toán chi tiết:
+   1 Tổng dung lượng dữ liệu phát sinh trong 1 năm:
+     Dữ liệu 1 năm = 50 MB/ngày × 365 ngày = 18,250 MB
+     Chuyển đổi sang GB = 18,250 ÷ 1024 ≈ 17.82 GB
+   2 Dung lượng ổ cứng tối thiểu cần trang bị (D{tối thiểu}):
+Vì dung lượng 17.82 GB chỉ được chiếm tối đa 70% (0.7) dung lượng ổ cứng:
+     D{tối thiểu} × 70% = 17.82 GB
+     D{tối thiểu} = 17.82 (GB) ÷ 0.7 ≈ 25.46 GB
+   3 Đề xuất trang bị thực tế:
+• Chọn bộ nhớ/thẻ nhớ MicroSD/SSD dung lượng tối thiểu 32 GB (hoặc tốt nhất là 64 GB) cho bộ điều khiển SoC (Raspberry Pi / Industrial Gateway).
+• Mức 32 GB đảm bảo dữ liệu lưu giữ trong 1 năm chỉ chiếm khoảng 55.6% dung lượng đĩa, hoàn toàn đáp ứng ngưỡng an toàn < 70%.

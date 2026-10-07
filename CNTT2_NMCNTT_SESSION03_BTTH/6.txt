@@ -1,0 +1,47 @@
+BÁO CÁO THIẾT KẾ HỆ THỐNG ỨNG DỤNG VÍ ĐIỆN TỬ MOMO-LITE
+PHẦN 1: THIẾT KẾ MÔ HÌNH 4 TẦNG DIKW CHO MOMO-LITE
+Mô hình DIKW thể hiện chuỗi chuyển hóa dữ liệu từ các giao dịch đơn lẻ thành những đề xuất tài chính thông minh cho người dùng MoMo-Lite:
+[ Tầng 4: WISDOM (Trí tuệ) ]       --> Gợi ý kế hoạch tiết kiệm & phân bổ ngân sách tự động
+          ▲
+[ Tầng 3: KNOWLEDGE (Tri thức) ]    --> Cảnh báo thông minh khi chi tiêu vượt định mức
+          ▲
+[ Tầng 2: INFORMATION (Thông tin) ] --> Báo cáo thống kê chi tiêu tổng hợp theo tháng
+          ▲
+[ Tầng 1: DATA (Dữ liệu thô) ]      --> Nhật ký nhật giao dịch chi tiêu thô (Lịch sử giao dịch)
+Chi tiết từng tầng trong kiến trúc:
+   1 Tầng 1 — Data (Dữ liệu thô):
+• Mô tả: Các bản ghi giao dịch thanh toán nguyên bản, chưa qua xử lý hay phân loại, được ghi nhận trực tiếp vào cơ sở dữ liệu.
+• Ví dụ: ID: 88231 | Time: 2026-10-06 12:30:15 | Amount: 45,000 VND | Category_ID: 04 | Merchant: Highlands Coffee.
+   2 Tầng 2 — Information (Thông tin):
+• Mô tả: Dữ liệu thô được hệ thống tổng hợp, nhóm theo danh mục và mốc thời gian để người dùng dễ dàng theo dõi.
+• Ví dụ: "Tổng chi tiêu tháng 10/2026 của bạn là 8,500,000 VND, trong đó nhóm 'Ăn uống & Cà phê' chiếm 3,200,000 VND (37.6%)".
+   3 Tầng 3 — Knowledge (Tri thức):
+• Mô tả: Kết hợp thông tin chi tiêu với các quy tắc tài chính cá nhân (If-Then rules / Budget thresholds) để đưa ra cảnh báo tự động.
+• Ví dụ: IF Chi tiêu 'Ăn uống' tháng 10 > Ngân sách đặt ra (3,000,000 VND) → THEN Hệ thống lập tức gửi cảnh báo: "Bạn đã vượt 200,000 VND so với hạn mức chi tiêu Ăn uống tháng này!".
+   4 Tầng 4 — Wisdom (Trí tuệ / Quyết định tối ưu):
+• Mô tả: Phân tích xu hướng chi tiêu dài hạn kết hợp mô hình dự báo tài chính để đưa ra đề xuất kế hoạch tiết kiệm cá nhân hóa.
+• Ví dụ: Hệ thống phân tích thấy người dùng thường xuyên chi vượt hạn mức vào tuần thứ 2 của tháng → Tự động trích lập Hũ tiết kiệm 10% ngay khi nhận lương và gợi ý: "Để đạt mục tiêu mua Laptop vào cuối năm, bạn nên cắt giảm 15% chi tiêu Cà phê/Giải trí và chuyển 500,000 VND/tháng vào Tích lũy" .
+PHẦN 2: XÁC ĐỊNH CÁC MODULE INPUT / PROCESS / OUTPUT (IPO)
+Sự phối hợp giữa các thành phần phần cứng và hệ thống trong ứng dụng MoMo-Lite:
+Module IPO         Thành phần / Tiến trình đảm nhiệm                                                              Chức năng chi tiết trong MoMo-Lite
+Input (Đầu vào)    Màn hình cảm ứng, API thanh toán, Cảm biến sinh trắc học (Fingerprint/FaceID), Bàn phím số.    Thu thập thao tác chuyển tiền/thanh toán QR code, đọc dữ liệu biến động số dư và yêu cầu từ người dùng.
+Process (Xử lý)    CPU/SoC, RAM, Thuật toán mã hóa & Phân tích dữ liệu tài chính.                                 Đọc file cấu hình .env chứa API Key/Secret Key bí mật, xác thực giao dịch, tính toán số dư, phân loại danh mục chi tiêu và so sánh hạn mức.
+Output (Đầu ra)    Màn hình hiển thị, Loa/Tệp âm thanh, Push Notifications, Storage (SSD/Database).               Hiển thị thông báo chuyển tiền thành công, xuất biểu đồ báo cáo tài chính tháng, phát âm thanh nhận tiền, và lưu nhật ký giao dịch xuống ổ cứng.
+PHẦN 3: GIẢI QUYẾT BẪY DỮ LIỆU & RÀNG BUỘC KỸ THUẬT
+1. Bẫy 1: Quản lý File cấu hình ẩn chứa khóa bí mật API (.env)
+• Bản chất: File .env chứa các API Key, Secret Token kết nối cổng thanh toán ngân hàng. Ký tự dấu chấm (.) ở đầu tên file khiến Hệ điều hành Windows/Linux tự động hiểu là file cấu hình hệ thống và ẩn đi.
+• Cách thao tác an toàn:
+   1 Bật hiển thị File ẩn: Mở File Explorer (Win + E) → chọn tab View → tích chọn Hidden items và File name extensions.
+   2 Bảo mật Git: Đưa .env vào file .gitignore để không bao giờ bị push nhầm mã bí mật lên các kho mã nguồn công khai (GitHub/GitLab).
+   3 Sao lưu cấu hình: Tạo file .env.example chứa các tên biến tham chiếu nhưng không có giá trị khóa thực tế.
+2. Bẫy 2: Tính toán Dung lượng Lưu trữ Giao dịch trong 1 Ngày
+Thông số bài toán:
+• Dung lượng 1 giao dịch: 1 KB.
+• Số lượng giao dịch trong 1 ngày: 1,000,000 giao dịch (1 triệu).
+Các bước tính toán quy đổi chuẩn hệ số 1024 (Kiểu hệ điều hành / Kiểu nhị phân):
+   1 Tính tổng dung lượng theo Kilobyte (KB):
+     Tổng KB = 1,000,000 giao dịch × 1 KB = 1,000,000 KB
+   2 Quy đổi từ KB sang Megabyte (MB) theo hệ số 1024:
+     Dung lượng (MB) = 1,000,000 KB ÷ 1024 ≈ 976.5625 MB
+(Ghi chú: Nếu tính theo quy chuẩn thập phân của nhà sản xuất ổ cứng hệ số 1000: 1,000,000 KB ÷ 1000 = 1000 MB).
+→ Kết luận: Hệ thống cần chính xác 976.56 MB (hoặc khoảng 1,000 MB) dung lượng lưu trữ mỗi ngày chỉ tính riêng cho dữ liệu giao dịch thô.

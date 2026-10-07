@@ -1,0 +1,61 @@
+BÁO CÁO PHÂN TÍCH VÀ GIẢI PHÁP KỸ THUẬT: DỰ ÁN SHOPEE-LITE
+PHẦN 1: BÁO CÁO PHÂN TÍCH
+1. Nguyên nhân gây lỗi FileNotFoundError do Đường dẫn tuyệt đối (Absolute Path)
+• Khái niệm: Đường dẫn tuyệt đối là đường dẫn chỉ định vị trí chính xác của một tệp tin bắt đầu từ gốc của ổ đĩa (ví dụ: C:\Users\NguyenVanA\Desktop\shopee-lite\assets\logo.png).
+• Lý do gây lỗi khi gửi sang máy khác:
+- Tên người dùng (User Profile) khác nhau: Khi máy bạn thân nhận dự án, đường dẫn trên máy mới có thể là D:\Projects\shopee-lite\... hoặc C:\Users\TranVanB\... .
+- Chữ cái đại diện ổ đĩa (Drive Letter) khác nhau: Một máy lưu tại ổ C:, máy kia lưu tại ổ D: hoặc E:.
+- Khác biệt Hệ điều hành: Nếu máy bạn dùng Windows (dùng dấu \) nhưng máy bạn thân dùng macOS/Linux (dùng dấu /), đường dẫn tuyệt đối dạng Windows sẽ đứt gãy hoàn toàn.
+- → Khi chương trình Python chạy lệnh tìm file theo đường dẫn tuyệt đối cũ cố định, Hệ điều hành không tìm thấy cấu trúc thư mục đó trên máy mới, dẫn đến lỗi FileNotFoundError.
+2. Phân tích luồng IPO (Input - Process - Output) của ứng dụng từ Storage vào RAM
+Khi khởi động ứng dụng Shopee-Lite, sự phối hợp giữa Storage, RAM và CPU diễn ra theo mô hình IPO như sau:
+[ STORAGE (Ổ cứng SSD/HDD) ] 
+       │ 
+       │  (1. Input: Đọc & Nạp mã nguồn + Tài nguyên)
+       ▼
+[ RAM (Bộ nhớ trong) ] <───> [ CPU (Bộ xử lý trung tâm) ]
+                               (2. Process: Giải mã & Tính toán)
+       │
+       │  (3. Output: Hiển thị giao diện & Phản hồi)
+       ▼
+[ MÀN HÌNH / BÀN PHÍM / CHUỘT ]
+1. Input (Đầu vào từ Storage):
+• Mã nguồn Python (app.py) và toàn bộ tài nguyên hình ảnh (assets/logo.png) đang được lưu trữ lâu dài trên Storage (SSD/HDD).
+• Khi kích hoạt chạy ứng dụng, Hệ điều hành thực hiện lệnh đọc dữ liệu từ Storage và nạp (load) toàn bộ mã nguồn, dữ liệu ảnh vào RAM để chuẩn bị xử lý.
+2. Process (Xử lý tại RAM & CPU):
+• RAM đóng vai trò là không gian làm việc tạm thời với tốc độ truy xuất cực nhanh, giữ lại các biến, hình ảnh đã giải mã và các tiến trình đang chạy.
+• CPU liên tục lấy dữ liệu từ RAM, thực hiện các phép toán logic, giải mã ảnh, dựng giao diện GUI và xử lý dữ liệu đơn hàng.
+3. Output (Đầu ra):
+• Dữ liệu hình ảnh logo và giao diện Shopee-Lite sau khi CPU xử lý xong sẽ được xuất ra màn hình (Display).
+• Các thao tác click chuột/phím của người dùng lại đóng vai trò là Input mới quay trở lại luồng xử lý.
+PHẦN 2: GIẢI PHÁP KỸ THUẬT
+1. Cấu trúc đường dẫn tương đối (Relative Path) chuẩn sử dụng ký hiệu . và ..
+Giả định cấu trúc thư mục dự án Shopee-Lite như sau:
+shopee-lite/
+├── assets/
+│   └── logo.png
+└── src/
+    └── views/
+        └── main_app.py
+• Cú pháp ký hiệu:
+- . : Đại diện cho Thư mục hiện tại (Current Directory).
+- .. : Đại diện cho Thư mục cha (Parent Directory - lùi lại 1 cấp).
+• Cách viết đường dẫn gọi file logo.png từ file main_app.py:
+- Từ main_app.py, ta cần lùi lại 2 cấp thư mục (thoát khỏi views và src để về thư mục gốc shopee-lite), sau đó đi vào assets/logo.png.
+- Đường dẫn tương đối:
+logo_path = "../../assets/logo.png"
+- Đề xuất chuẩn hóa trên Python (Khuyên dùng để tự động thích ứng mọi OS):
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+LOGO_PATH = BASE_DIR / "assets" / "logo.png"
+2. Đề xuất 3 bước xử lý giảm lag cho máy bạn thân (Task Manager = 98% RAM)
+Khắc phục tình trạng quá tải bộ nhớ làm treo hệ thống:
+• Bước 1 — Kết thúc (End Task) các tiến trình ngầm ngốn RAM:
+- Mở Task Manager (Ctrl + Shift + Esc) → Chọn tab Processes → Click vào cột Memory để sắp xếp các ứng dụng đang ngốn RAM nhiều nhất lên đầu.
+- Chọn các ứng dụng chạy ngầm không cần thiết (Chrome/Edge nhiều tab, Discord, Game Launcher...) và nhấn End Task để giải phóng RAM ngay lập tức.
+• Bước 2 — Tối ưu hóa cách nạp tài nguyên (Code Optimization):
+- Kiểm tra lại mã nguồn Python: Tránh việc nạp (load) cùng lúc toàn bộ hàng trăm file ảnh có độ phân giải cao vào RAM khi vừa mở app.
+- Áp dụng kỹ thuật Lazy Loading (chỉ nạp ảnh khi giao diện cần hiển thị) và giải phóng bộ nhớ (đóng các file/stream sau khi đọc xong bằng câu lệnh with open(...)).
+• Bước 3 — Tắt ứng dụng khởi động cùng hệ thống (Startup Apps) & Bật Paging File:
+- Trong Task Manager → Chuyển sang tab Startup Apps → Disable tất cả các ứng dụng không quan trọng khởi động cùng Windows.
+- Tăng dung lượng Bộ nhớ ảo (Virtual Memory / Pagefile) trên Windows để hệ thống có không gian đệm khi RAM vật lý bị quá tải, tránh hiện tượng treo cứng máy.

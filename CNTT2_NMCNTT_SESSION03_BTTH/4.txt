@@ -1,0 +1,48 @@
+PHẦN 1: PHÂN TÍCH CHẨN ĐOÁN VÀ VAI TRÒ TÀI NGUYÊN HỆ THỐNG
+1. Chẩn đoán nguyên nhân máy bị lag qua Task Manager (%CPU và %RAM)
+• Chẩn đoán chỉ số %RAM (Gần ngưỡng 100%):
+- Mỗi tab Chrome ngốn trung bình 150 MB - 300 MB RAM. Với 20 tab Chrome mở đồng thời, lượng RAM tiêu tốn đã lên tới khoảng 3 GB - 5 GB.
+- Trình soạn thảo VS Code cùng các tiện ích mở rộng (extensions) và trình thông dịch Python chiếm khoảng 1 GB - 2 GB RAM.
+- Hệ điều hành Windows 11/10 duy trì hoạt động ngầm tiêu tốn khoảng 2.5 GB - 3 GB RAM.
+- → Tổng dung lượng RAM yêu cầu vượt quá dung lượng RAM vật lý (8 GB), dẫn đến hiện tượng tràn bộ nhớ (RAM Bottleneck).
+• Cơ chế Swap File (Pagefile) và hiện tượng đứng máy:
+- Khi RAM bị đầy (100%), Hệ điều hành buộc phải dùng cơ chế Bộ nhớ ảo (Virtual Memory): chuyển bớt dữ liệu tạm thời từ RAM ghi tạm vào một file ẩn trên SSD gọi là Swap File / Pagefile.
+- Dù SSD có tốc độ nhanh, tốc độ truy xuất của SSD (khoảng 500 MB/s - 3500 MB/s) vẫn chậm hơn hàng chục lần so với RAM (tốc độ RAM DDR4/DDR5 đạt từ 20,000 MB/s - 50,000 MB/s).
+- CPU phải tốn liên tục các chu kỳ xử lý (%CPU tăng cao do I/O Wait) để chờ SSD đọc/ghi chuyển đổi dữ liệu qua lại giữa RAM và Swap File, làm cho toàn bộ hệ thống bị đứng cứng (Freezing/Lag).
+2. Phân biệt vai trò giữa RAM (Bàn làm việc) và Storage (Ngăn tủ)
+Sự phối hợp trong mô hình IPO (Input - Process - Output) được ví như công việc tại văn phòng:
+• RAM — Bàn làm việc (Bộ nhớ tạm thời / Volatile Memory):
+- Vai trò: Là không gian chứa các tài liệu, công cụ mà CPU đang trực tiếp xử lý ở thời điểm hiện tại (20 tab Chrome, VS Code, ứng dụng Python đang chạy).
+- Đặc tính: Tốc độ truy xuất cực kỳ nhanh nhưng dữ liệu sẽ biến mất hoàn toàn khi tắt máy hoặc mất điện. Mặt bàn (8 GB) bị quá tải khi bày quá nhiều tài liệu cùng lúc.
+• Storage (SSD) — Ngăn tủ tài liệu (Bộ nhớ lưu trữ lâu dài / Non-volatile Memory):
+- Vai trò: Là nơi cất giữ, bảo quản toàn bộ dữ liệu hệ thống, file mã nguồn Python, phần mềm cài đặt kể cả khi máy đã tắt hoàn toàn.
+- Đặc tính: Dung lượng lớn (256 GB), lưu giữ dữ liệu an toàn lâu dài nhưng tốc độ truy xuất chậm hơn nhiều so với RAM. Khi mặt bàn (RAM) quá tải, người dùng phải liên tục chạy ra mở ngăn tủ (SSD) để đổi tài liệu, gây ra hiện tượng chậm trễ.
+3. Phân tích bẫy dữ liệu: Lưu code tại C:\Windows\System32\Code của tôi
+• Nguy cơ bảo mật và phân quyền: System32 là thư mục chứa các tệp tin hệ thống cốt lõi của Windows. Thao tác tại đây đòi hỏi quyền Quản trị viên (Administrator), dễ gây ra lỗi không cấp đủ quyền cho Python khi tạo/ghi file.
+• Nguy cơ mất trắng dữ liệu: Ổ C: là phân vùng cài đặt Hệ điều hành. Khi máy bị lỗi Win, dính virus hoặc cần Format để cài lại hệ điều hành, toàn bộ dữ liệu tại ổ C: (bao gồm cả thư mục System32) sẽ bị xóa sạch hoàn toàn.
+• Quy chuẩn đặt tên: Tên thư mục Code của tôi chứa tiếng Việt có dấu và khoảng trắng, gây lỗi phân tách tham số khi thực thi lệnh trên Terminal/CLI hoặc khi chuyển đổi môi trường mã nguồn.
+PHẦN 2: THIẾT KẾ CÂY THƯ MỤC CHUẨN TRÊN Ổ D:
+Thiết kế lại toàn bộ hệ thống lưu trữ trên Phân vùng an toàn (D:\) áp dụng Quy tắc 4 Trụ cột, Nguyên tắc 3 Cấp Thư mục và Naming Convention chuẩn kebab-case (viết thường, không dấu, phân tách bằng dấu gạch ngang -):
+Sơ đồ Cây thư mục Học tập (File Tree):
+D:\
+├── 01-hoc-tap/                         <-- CẤP 1: Trụ cột 1 (Nội dung Học tập)
+│   ├── it108-nhap-mon-cntt/            <-- CẤP 2: Thư mục Môn học (kebab-case)
+│   │   ├── session-01/                 <-- CẤP 3: Buổi học / Bài tập
+│   │   │   └── bai-tap-1.py
+│   │   └── session-03/
+│   │       └── btth-4.py
+│   └── lap-trinh-python-co-ban/
+│       └── session-01/
+├── 02-projects/                        <-- CẤP 1: Trụ cột 2 (Dự án & Source Code)
+│   └── du-an-python-dau-tay/           <-- CẤP 2: Dự án cá nhân
+│       ├── src/                        <-- CẤP 3: Mã nguồn
+│       ├── .git/                       <-- (Folder ẩn quản lý phiên bản)
+│       └── .vscode/                    <-- (Folder ẩn cấu hình IDE)
+├── 03-personal/                        <-- CẤP 1: Trụ cột 3 (Giấy tờ & Cá nhân)
+│   └── giay-to-sinh-vien/
+│       └── thong-tin-nhap-hoc/
+└── 04-media/                           <-- CẤP 1: Trụ cột 4 (Tài nguyên Hình ảnh / Video)
+    └── anh-tai-lieu/
+        └── so-do-thu-muc/
+Đường dẫn tuyệt đối chuẩn tới file code Python mới:
+D:\01-hoc-tap\it108-nhap-mon-cntt\session-03\btth-4.py

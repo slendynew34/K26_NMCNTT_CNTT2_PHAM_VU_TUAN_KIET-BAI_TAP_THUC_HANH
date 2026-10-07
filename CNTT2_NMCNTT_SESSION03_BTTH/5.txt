@@ -1,0 +1,40 @@
+BÁO CÁO GIẢI QUYẾT BÀI TẬP VỀ NHÀ SESSION 4 — BÀI 5
+PHẦN 1: PHÂN TÍCH & SO SÁNH
+1. Bảng so sánh Đường dẫn Tuyệt đối (Absolute Path) và Đường dẫn Tương đối (Relative Path)
+Tiêu chí                  Đường dẫn Tuyệt đối (Absolute Path)                                                                  Đường dẫn Tương đối (Relative Path)
+Định nghĩa                Đường dẫn chỉ rõ vị trí đầy đủ của file/thư mục bắt đầu từ gốc phân vùng đĩa (C:\, D:\, /).          Đường dẫn xác định vị trí file/thư mục dựa trên vị trí của file code hiện tại làm mốc.
+Cú pháp mốc               Bắt đầu bằng tên ổ đĩa, ví dụ: C:\Users\...                                                          Bắt đầu bằng ., .. hoặc tên thư mục con.
+Tính linh hoạt            Rất thấp. Khi đổi máy, đổi tên thư mục cha hoặc đổi User Profile sẽ bị hỏng đường dẫn ngay.          Rất cao. Có thể chia sẻ code, chuyển dự án sang máy khác mà code vẫn hoạt động bình thường.
+Trường hợp dùng           Dùng khi truy xuất tài nguyên hệ thống cố định hoặc ổ đĩa tuyệt đối trên cùng 1 server.              Dùng trong quản lý mã nguồn dự án, kết nối file trong HTML/CSS/Python/Git.
+2. Tính toán chính xác thời gian tải file 2 GB với gói mạng 80 Mbps
+Bước 1 — Đổi dung lượng file từ Gigabyte (GB) sang Megabit (Mb):
+• Dung lượng file: 2 GB = 2 × 1024 MB = 2048 MB.
+• Vì 1 Byte = 8 bits → 2048 MB = 2048 × 8 = 16,384 Mb (Megabits).
+Bước 2 — Quy đổi tốc độ tải lý thuyết sang MB/s:
+• Tốc độ gói mạng: 80 Mbps (Megabits per second).
+• Tốc độ tải thực tế tính theo Megabytes: 80 Mbps ÷ 8 = 10 MB/s.
+Bước 3 — Tính thời gian tải lý thuyết (đơn vị giây):
+• Thời gian tải (giây) = Tổng dung lượng (Mb) ÷ Tốc độ mạng (Mbps) = 16,384 Mb ÷ 80 Mbps = 204.8 giây
+(Hoặc tính theo MB/s: 2048 MB ÷ 10 MB/s = 204.8\ giây)
+→ Kết quả: Thời gian tải file 2 GB với gói mạng 80 Mbps mất chính xác 204.8 giây (khoảng 3 phút 25 giây).
+PHẦN 2: HÀNH ĐỘNG & THIẾT LẬP KỸ THUẬT
+1. Viết lại đường dẫn file dưới dạng Relative Path
+Giả định cấu trúc thư mục của dự án bạn thân gửi như sau:
+Project/
+├── main.py        <-- File code đang thực thi
+└── data/
+    └── db.csv     <-- File dữ liệu cần kết nối
+• Đường dẫn tương đối chuẩn:
+data/db.csv
+(hoặc ./data/db.csv)
+• Trường hợp file code nằm ở một thư mục con khác (ví dụ: Project/src/app.py):
+- Cần lùi ra 1 cấp thư mục cha (..) rồi đi vào data/db.csv:
+../data/db.csv
+2. Đề xuất các bước thiết lập "View Options" để nhận diện file mã độc
+Lý do nguy hiểm: Kẻ gian sử dụng kỹ thuật Đuôi mở rộng kép (Double Extension) đặt tên file là tai-lieu-on-tap.pdf.exe. Khi Windows mặc định ẩn phần mở rộng file, người dùng chỉ nhìn thấy tên tai-lieu-on-tap.pdf và lầm tưởng là file PDF, nhưng khi nhấp đúp vào sẽ thực thi file mã độc .exe.
+Các bước cấu hình hiển thị đuôi file trên Windows 10/11:
+   1 Mở cửa sổ File Explorer (Win + E).
+   2 Nhấn vào tab View trên thanh Menu chính.
+   3 Trong nhóm tùy chọn Show/hide, tích chọn vào ô File name extensions.
+   4 (Tùy chọn bổ sung) Tích chọn luôn ô Hidden items để quan sát các file ẩn nguy hiểm trong dự án.
+Kết quả thu được: Tệp tin giả mạo sẽ lập tức hiện rõ tên thật là tai-lieu-on-tap.pdf.exe, giúp người dùng phát hiện file thực thi nguy hiểm và xóa bỏ ngay lập tức.
